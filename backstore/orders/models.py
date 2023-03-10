@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from products.models import Product
 
 
-# Model for orders
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     products = models.ManyToManyField(
