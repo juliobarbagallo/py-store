@@ -13,13 +13,19 @@ def products(request):
 
 
 def add_product(request):
+    print("add_product() called")
     if request.method == "POST":
         form = ProductForm(request.POST)
+        print("FORM: ", form)
         if form.is_valid():
+            print("Everything was ok!")
             form.save()
             return redirect(reverse("products:products"))
+        print("Something is wrong!")
     else:
+        print("form = ProductForm()")
         form = ProductForm()
+    print("the retun statement")
     return render(request, "add_product.html", {"form": form})
 
 
