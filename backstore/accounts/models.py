@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from products.models import Product
+from orders.models import Order, OrderProduct
 
 
 class Account(models.Model):
@@ -13,50 +14,34 @@ class Account(models.Model):
 
     @property
     def get_cart_total(self):
-        order_items = self.cart.orderproduct_set.all()
-        total = sum([item.get_total for item in order_items])
-        return total
+        # Get the user's open order, if any
+        open_order = self.get_open_order()
+        if open_order:
+            return open_order.get_order_total
+        else:
+            return 0
 
     @property
     def get_cart_items(self):
-        order_items = self.cart.orderproduct_set.all()
-        total_items = sum([item.quantity for item in order_items])
-        return total_items
+        # Get the user's open order, if any
+        open_order = self.get_open_order()
+        if open_order:
+            return open_order.get_order_products
+        else:
+            return []
 
+    def get_open_order(self):
+        # Get the user's open order, or create one if none exists
+        open_orders = Order.objects.filter(user=self.user, status="open")
+        if open_orders.exists():
+            return open_orders.first()
+        else:
+            new_order = Order.objects.create(user=self.user, status="open")
+            return new_order
 
-class Cart(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user_cart"
-    )
-    products = models.ManyToManyField(Product, blank=True, related_name="user_carts")
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"Cart for {self.user.username}"
-
-    @property
-    def get_cart_products(self):
-        cart_items = self.cartproduct_set.all()
-        return cart_items
-
-    @property
-    def get_cart_total(self):
-        cart_items = self.cartproduct_set.all()
-        total = sum([item.get_total for item in cart_items])
-        return total
-
-
-class CartProduct(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-
-    def __str__(self):
-        return f"{self.quantity} of {self.product.name} in cart"
-
-    @property
-    def get_total(self):
-        total = self.product.price * self.quantity
-        return total
+    def complete_order(self):
+        # Complete the user's open order, if any
+        open_order = self.get_open_order()
+        if open_order:
+            open_order.status = "complete"
+            open_order.save()
