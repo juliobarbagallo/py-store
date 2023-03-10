@@ -9,6 +9,8 @@ psycopg2-binary = "*"
 black = "*"
 pre-commit = "*"
 django-extensions = "*"
+logger = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
