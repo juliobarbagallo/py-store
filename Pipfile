@@ -8,6 +8,7 @@ django = "*"
 psycopg2-binary = "*"
 black = "*"
 pre-commit = "*"
+django-extensions = "*"
 
 [dev-packages]
 
