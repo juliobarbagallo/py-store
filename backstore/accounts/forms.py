@@ -26,6 +26,7 @@ class CustomUserCreationForm(UserCreationForm):
         user.email = self.cleaned_data["email"]
         if commit:
             user.save()
+            Account.objects.create(user=user)
         return user
 
 

@@ -1,11 +1,17 @@
 import logging
+from django.contrib import messages
 from utils.logging_config import configure_logger
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from .models import Account
 from .forms import CustomUserCreationForm, UserUpdateForm, ProfileUpdateForm
-from django.contrib.auth import logout, authenticate, login as auth_login
+from django.contrib.auth import (
+    update_session_auth_hash,
+    logout,
+    authenticate,
+    login as auth_login,
+)
 
 
 app_name = "accounts"
@@ -43,6 +49,7 @@ def view_profile(request):
     context = {
         "user": request.user,
     }
+    logger.debug(f"{context=}")
     return render(request, "view_profile.html", context)
 
     # return render(request, "profile.html", {"user": request.user})
@@ -50,45 +57,27 @@ def view_profile(request):
 
 @login_required
 def update_profile(request):
-    logger.info("update_profile() was called.")
+    logger.debug("update_profile() was called.")
+    user = request.user
+    logger.debug(f"{user=}")
     if request.method == "POST":
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        password_form = PasswordChangeForm(user=request.user, data=request.POST)
-
-        if hasattr(request.user, "account"):
-            profile_form = ProfileUpdateForm(
-                request.POST, instance=request.user.account
-            )
-            if (
-                user_form.is_valid()
-                and profile_form.is_valid()
-                and password_form.is_valid()
-            ):
-                user_form.save()
-                profile_form.save()
-                password_form.save()
-                update_session_auth_hash(request, request.user)
-                return redirect("accounts:profile")
+        user_form = UserUpdateForm(request.POST, instance=user)
+        profile_form = ProfileUpdateForm(request.POST, instance=user.account)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated!")
+            return redirect("accounts:update_profile")
         else:
-            if user_form.is_valid() and password_form.is_valid():
-                user_form.save()
-                password_form.save()
-                update_session_auth_hash(request, request.user)
-                return redirect("accounts:profile")
+            messages.error(request, "Please correct the errors below.")
     else:
-        user_form = UserUpdateForm(instance=request.user)
-        password_form = PasswordChangeForm(user=request.user)
-
-        if hasattr(request.user, "account"):
-            profile_form = ProfileUpdateForm(instance=request.user.account)
+        user_form = UserUpdateForm(instance=user)
+        if hasattr(user, "account"):
+            profile_form = ProfileUpdateForm(instance=user.account)
         else:
-            profile_form = None
+            profile_form = ProfileUpdateForm()
 
-    context = {
-        "user_form": user_form,
-        "profile_form": profile_form,
-        "password_form": password_form,
-    }
+    context = {"user_form": user_form, "profile_form": profile_form}
     return render(request, "update_profile.html", context)
 
 
@@ -101,13 +90,6 @@ def register(request):
         if form.is_valid():
             logger.debug("form is valid")
             form.save()
-            # username = form.cleaned_data.get("username")
-            # raw_password = form.cleaned_data.get("password1")
-            # Create a new account for the user
-            # user = form.save()
-            # Account.objects.create(user=user)
-            # Log the user in and redirect to the profile page
-            # return redirect("accounts:profile")
             return redirect("accounts:view_profile")
         logger.error(f"Seems like form is not valid! - {form.errors=}")
     else:
