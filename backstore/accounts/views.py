@@ -53,21 +53,41 @@ def update_profile(request):
     logger.info("update_profile() was called.")
     if request.method == "POST":
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(
-            request.POST, request.FILES, instance=request.user.account
-        )
+        password_form = PasswordChangeForm(user=request.user, data=request.POST)
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            return redirect("accounts:profile")
+        if hasattr(request.user, "account"):
+            profile_form = ProfileUpdateForm(
+                request.POST, instance=request.user.account
+            )
+            if (
+                user_form.is_valid()
+                and profile_form.is_valid()
+                and password_form.is_valid()
+            ):
+                user_form.save()
+                profile_form.save()
+                password_form.save()
+                update_session_auth_hash(request, request.user)
+                return redirect("accounts:profile")
+        else:
+            if user_form.is_valid() and password_form.is_valid():
+                user_form.save()
+                password_form.save()
+                update_session_auth_hash(request, request.user)
+                return redirect("accounts:profile")
     else:
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.account)
+        password_form = PasswordChangeForm(user=request.user)
+
+        if hasattr(request.user, "account"):
+            profile_form = ProfileUpdateForm(instance=request.user.account)
+        else:
+            profile_form = None
 
     context = {
         "user_form": user_form,
         "profile_form": profile_form,
+        "password_form": password_form,
     }
     return render(request, "update_profile.html", context)
 
