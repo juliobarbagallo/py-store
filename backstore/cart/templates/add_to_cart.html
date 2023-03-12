@@ -1,0 +1,13 @@
+{% block content %}
+  <h1>Add to Cart</h1>
+  <form method="post">
+    {% csrf_token %}
+    <p>Product: {{ product.name }}</p>
+    <p>Price: {{ product.price }}</p>
+    <p>
+      <label for="quantity">Quantity:</label>
+      <input type="number" name="quantity" id="quantity" value="1" min="1">
+    </p>
+    <button type="submit">Add to Cart</button>
+  </form>
+{% endblock %}
