@@ -38,12 +38,3 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name}"
-
-
-class OrderProductItem(models.Model):
-    order_product = models.ForeignKey(OrderProduct, on_delete=models.CASCADE)
-    attribute_name = models.CharField(max_length=50)
-    attribute_value = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.attribute_name}: {self.attribute_value}"

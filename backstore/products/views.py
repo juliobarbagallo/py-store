@@ -6,12 +6,15 @@ from django.http import HttpResponse
 from .models import Product
 from django.urls import reverse
 
+from django.contrib.auth.decorators import login_required
+
 app_name = "products"
 log_file_path = f"{app_name}/{app_name}.out"
 log_level = logging.DEBUG
 logger = configure_logger(log_file_path, log_level)
 
 
+@login_required
 def products(request):
     logger.info("products() was called.")
     logger.debug(f"{request=} - {request.body=} - {request.POST=}")
