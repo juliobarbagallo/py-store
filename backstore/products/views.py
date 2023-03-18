@@ -28,24 +28,6 @@ class Ping(APIView):
         return Response({"message": "pong"})
 
 
-# class ProductList(APIView):
-#     def get(self, request, format=None):
-
-#         r = redis.Redis(host=os.getenv("REDIS_HOST"), port=os.getenv("REDIS_PORT"), db=os.getenv("REDIS_DB"))
-#         product_list = r.get('product_list')
-#         if product_list:
-#             # If the product list is in Redis, return it
-#             products = json.loads(product_list)
-#         else:
-#             # If the product list is not in Redis, query the database and cache the result
-#             products = Product.objects.all()
-#             serializer = ProductSerializer(products, many=True)
-#             products = serializer.data
-#             r.set('product_list', json.dumps(products))
-
-#         return Response(products)
-
-
 class ProductList(APIView):
     def get(self, request, format=None):
         try:
