@@ -5,13 +5,28 @@ from .forms import ProductForm
 from django.http import HttpResponse
 from .models import Product
 from django.urls import reverse
-
 from django.contrib.auth.decorators import login_required
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import ProductSerializer
 
 app_name = "products"
 log_file_path = f"{app_name}/{app_name}.out"
 log_level = logging.DEBUG
 logger = configure_logger(log_file_path, log_level)
+
+
+class Ping(APIView):
+    def get(self, request, format=None):
+        return Response({"message": "pong"})
+
+
+class ProductList(APIView):
+    def get(self, request, format=None):
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 @login_required
