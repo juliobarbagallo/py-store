@@ -11,6 +11,9 @@ pre-commit = "*"
 django-extensions = "*"
 logger = "*"
 python-dotenv = "*"
+install = "*"
+djangorestframework = "*"
+django-redis = "*"
 
 [dev-packages]
 
