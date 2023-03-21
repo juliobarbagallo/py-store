@@ -8,6 +8,7 @@
 
     <h1>Cart {{ cart_total }}</h1>
     <h2><a href="{% url 'cart:clean_cart'%}">Clean Cart</a></h2>
+    <a href="{% url 'orders:order_create' %}">Create Order</a>
     <ul>
         {% for cart_item in cart_items %}
         <li>

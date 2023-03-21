@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from orders.views import order_create
 
 app_name = "cart"
 
@@ -9,4 +10,5 @@ urlpatterns = [
     path("cart/", views.cart_detail, name="cart_detail"),
     path("clean_cart", views.clean_cart, name="clean_cart"),
     path("remove/<int:item_id>", views.remove_from_cart, name="remove_from_cart"),
+    path("order_create", order_create, name="order_create"),
 ]

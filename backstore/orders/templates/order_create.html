@@ -1,0 +1,8 @@
+{% block content %}
+  <h1>Create a New Order</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Order</button>
+  </form>
+{% endblock %}
