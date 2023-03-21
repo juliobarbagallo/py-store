@@ -3,7 +3,6 @@ import os
 from utils.logging_config import configure_logger
 from django.shortcuts import render, redirect
 from .forms import ProductForm
-from django.http import HttpResponse
 from .models import Product
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -12,10 +11,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ProductSerializer
 
-from django.core.cache import cache
+
 import json
 import redis
-from django.conf import settings
+
 
 app_name = "products"
 log_file_path = f"{app_name}/{app_name}.out"
