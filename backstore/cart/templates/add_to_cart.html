@@ -1,5 +1,6 @@
 {% block content %}
   <h1>Add to Cart</h1>
+
   <form method="post">
     {% csrf_token %}
     <p>Product: {{ product.name }}</p>
